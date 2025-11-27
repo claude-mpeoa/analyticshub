@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Hub - Log In</title>
+    <style>
+        /* --- RESET & VARIABLES (Pulled from home-tasks.html) --- */
+        :root {
+            --primary-color: #2563eb;     /* Royal Blue */
+            --primary-hover: #1d4ed8;
+            --sidebar-bg: #0f172a;        /* Slate 900 */
+            --bg-color: #f1f5f9;          /* Slate 100 */
+            --text-color: #334155;        /* Slate 700 */
+            --card-bg: #ffffff;
+            --input-border: #cbd5e1;      /* Slate 300 */
+            --error-color: #dc2626;       /* Red 600 */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            /* Placeholder background for when the modal is up */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- MODAL OVERLAY --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75); /* Darker backdrop */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* Ensure it is on top of everything */
+            opacity: 1; /* Start visible */
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* --- LOGIN CARD STYLING (Same as previous, now inside modal) --- */
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 2.5rem;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            border: 1px solid #e2e8f0;
+            text-align: center;
+            transform: scale(1);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.hidden .login-container {
+             transform: scale(0.95);
+        }
+
+        .brand {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--sidebar-bg);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .brand span {
+            color: var(--primary-color);
+        }
+
+        /* --- FORM ELEMENTS --- */
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .input-group {
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            font-size: 1rem;
+            color: var(--text-color);
+            transition: border-color 0.2s;
+        }
+
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-login {
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            margin-top: 1rem;
+        }
+
+        .btn-login:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-login:active {
+            transform: scale(0.99);
+        }
+
+        /* --- ERROR MESSAGE --- */
+        #error-message {
+            color: var(--error-color);
+            font-weight: 600;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            min-height: 1.5rem; /* Reserve space */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="modal-overlay" id="loginModal">
+        <div class="login-container">
+            <div class="brand">
+                <span>◆</span> ANALYTICS HUB
+            </div>
+            
+
+            <form class="login-form" id="loginForm" onsubmit="handleLogin(event)">
+                
+                <div class="input-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required placeholder="Enter your email" autofocus>
+                </div>
+                
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="Enter your password">
+                </div>
+
+                <div id="error-message"></div>
+                
+                <button type="submit" class="btn-login">Access Dashboard</button>
+            </form>
+           <br> <hr>
+            <p style="margin-top: 1rem; font-size: 0.85rem; color: #94a3b8; line-height: 1.5;">
+                <b>Request access via email: </b><br> 
+		Claude Mpeoa <br>
+		claude.mpeoa@virginactive.co.za <br>
+		Digital Analytics and Insights Manager <em>(Marketing)</em> <br>
+                
+		
+            </p>
+        </div>
+    </div>
+    <script>
+        // Ensure the modal is visible immediately (it is visible by default in CSS)
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('email').focus();
+        });
+
+        function handleLogin(event) {
+        // Prevent the default form submission
+        event.preventDefault(); 
+
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const errorMessage = document.getElementById('error-message');
+        const loginModal = document.getElementById('loginModal');
+        
+        const email = emailInput.value.trim();
+        const password = passwordInput.value.trim();
+
+        // 1. Define the authorized users, passwords, AND THEIR ROLES
+const authorizedUsers = {
+            "claude.mpeoa@virginactive.co.za": { password: "Claude@7072", role: "Administrator" },  // Full Access
+            "simone.frost@virginactive.co.za": { password: "Simone@1", role: "Marketing Executive" }, // Medium Access      
+            "joanne.goldblatt@virginactive.co.za": { password: "Joanne@1", role: "Sales Executive" }, // Medium Access
+	"ankit.shah@virginactive.co.za": { password: "Ankit@1", role: "Marketing Executive" }, // Medium Access
+	"dante.doubell@virginactive.co.za": { password: "Dante@1", role: "Analyst" } // Full Access
+        };
+
+        const user = authorizedUsers[email];
+        
+        // 2. Check credentials
+        if (user && user.password === password) {
+            // Success: 
+            errorMessage.textContent = "";
+
+            // *** CRITICAL STEP: SAVE THE ROLE TO LOCAL STORAGE ***
+            localStorage.setItem('userRole', user.role); 
+            
+            // Hide the modal
+            loginModal.classList.add('hidden');
+            
+            const redirectUrl = "file:///C:/Users/ClaudeMpeoa/OneDrive%20-%20Virgin%20Active%20South%20Africa/Desktop/Preliminary%20Reporting/Reports%20Access%20Center/home-main.html";
+
+            // Redirect after a short delay
+            setTimeout(() => {
+                window.location.href = redirectUrl;
+            }, 400); 
+
+        } else {
+            // Failure: Display error message
+            errorMessage.textContent = "Invalid email or password. Please try again.";
+        }
+    }
+</script>
+
+</body>
+</html>

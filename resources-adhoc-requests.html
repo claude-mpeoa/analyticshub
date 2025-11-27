@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics and Insights Access Point</title>
+    <style>
+        /* --- RESET & VARIABLES --- */
+        :root {
+            --sidebar-width: 280px;
+            --primary-color: #2563eb;     /* Royal Blue */
+            --primary-hover: #1d4ed8;
+            --sidebar-bg: #0f172a;        /* Slate 900 */
+            --sidebar-text: #e2e8f0;      /* Slate 200 */
+            --bg-color: #f1f5f9;          /* Slate 100 */
+            --text-color: #334155;        /* Slate 700 */
+            --card-bg: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: row;
+        }
+
+        /* --- STICKY SIDEBAR NAVIGATION --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+            z-index: 10;
+            overflow-y: auto;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #334155;
+        }
+
+        .brand span {
+            color: var(--primary-color);
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #94a3b8;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transform: translateX(5px);
+        }
+
+        .nav-links a.active {
+            background-color: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.4);
+        }
+
+        .nav-section-title {
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+        }
+
+        /* --- MAIN CONTENT AREA --- */
+        .main-content {
+            flex: 1;
+            padding: 2.5rem;
+            overflow-y: auto;
+        }
+
+        header {
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        /* --- DASHBOARD GRID SYSTEM --- */
+        .dashboard-grid {
+            display: grid;
+            /* Responsive columns: fits as many 320px columns as possible */
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        /* --- CARD STYLING --- */
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e2e8f0;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: var(--primary-color);
+        }
+
+        /* Image Placeholders */
+        .card-placeholder-img {
+            height: 180px;
+            width: 100%;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        /* Visual icons purely for the placeholder effect */
+        .placeholder-icon {
+            font-size: 3rem;
+            opacity: 0.2;
+            color: #475569;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            width: fit-content;
+        }
+
+        .tag-finance { background-color: #dbeafe; color: #1e40af; }
+        .tag-hr { background-color: #fce7f3; color: #9d174d; }
+        .tag-ops { background-color: #dcfce7; color: #166534; }
+        .tag-sales { background-color: #ffedd5; color: #9a3412; }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-desc {
+            color: #64748b;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            flex-grow: 1; /* Pushes button to bottom */
+        }
+
+        .btn-access {
+            display: block;
+            width: 100%;
+            padding: 0.875rem;
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+
+        .btn-access:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 900px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 1rem;
+            }
+
+            .sidebar .nav-links {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .nav-section-title, .brand {
+                text-align: center;
+                justify-content: center;
+            }
+
+            .brand { margin-bottom: 1rem; }
+            
+            .nav-section-title {
+                width: 100%;
+                margin-top: 1rem;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .sidebar .nav-links {
+                display: block; /* Stack links on very small screens */
+            }
+            .main-content {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sticky Left Navigation -->
+    <nav class="sidebar">
+        <div class="brand">
+            <span>◆</span> ANALYTICS HUB
+        </div>
+
+        <div class="nav-section-title">Main Menu</div>
+        <ul class="nav-links">
+            <li><a href="home-main.html"  >Home</a></li>
+            <li id="link-tasks"><a href="home-tasks.html">Analytics Tasks</a></li>
+            <li id="link-exceptions" ><a href="home-exception-monitoring.html">Exception Monitoring</a></li>
+        </ul>
+
+        <div class="nav-section-title">Resources</div>
+        <ul class="nav-links">
+            <li id="link-dashboards"><a href="resources-marketing-dashboards.html">Sales & Marketing Reports</a></li>
+            <li id="link-powerbi"><a href="resources-powerbi-dashboards.html">Power BI Reports</a></li>
+            <li id="link-planning"><a href="resources-planning-budgeting.html">Planning and Budgeting Documents</a></li>
+            <li id="link-adhoc" ><a href="resources-adhoc-requests.html"  class="active">Ad-Hoc Requests</a></li>
+            <li id="link-projects"><a href="resources-projects.html">Analytics Projects</a></li>
+            <li id="link-documents"><a href="resources-documents-processes.html">Documents & Processes</a></li>
+            
+        </ul>
+        
+        <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid #334155;">
+             <ul class="nav-links">
+                
+
+                <li><a href="login.html">⟳ Logout</a></li>
+             </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <header>
+            <h1>Ad Hoc Requests</h1>
+            <p class="subtitle">Centralized access point for all enterprise dashboards and reporting tools.</p>
+        </header>
+
+        <div class="dashboard-grid">
+
+            <!-- Dashboard Card 1 -->
+            <article class="card">
+                <div class="card-placeholder-img">
+                    <div class="placeholder-icon">📊</div>
+                </div>
+                <div class="card-body">
+                    <span class="card-tag tag-sales">Sales</span>
+                    <h3 class="card-title">Global Revenue Tracker</h3>
+                    <p class="card-desc">Real-time view of sales performance across all regions, including year-over-year comparisons and quarterly forecasts.</p>
+                    <a href="#" class="btn-access">Launch Dashboard →</a>
+                </div>
+            </article>
+
+            <!-- Dashboard Card 2 -->
+            <article class="card">
+                <div class="card-placeholder-img">
+                    <div class="placeholder-icon">👥</div>
+                </div>
+                <div class="card-body">
+                    <span class="card-tag tag-hr">HR & Talent</span>
+                    <h3 class="card-title">Workforce Demographics</h3>
+                    <p class="card-desc">Insights into employee retention, headcount growth, diversity metrics, and talent acquisition pipelines.</p>
+                    <a href="#" class="btn-access">Launch Dashboard →</a>
+                </div>
+            </article>
+
+            <!-- Dashboard Card 3 -->
+            <article class="card">
+                <div class="card-placeholder-img">
+                    <div class="placeholder-icon">💰</div>
+                </div>
+                <div class="card-body">
+                    <span class="card-tag tag-finance">Finance</span>
+                    <h3 class="card-title">Expense Management</h3>
+                    <p class="card-desc">Detailed breakdown of operational expenses (OPEX) versus capital expenditures (CAPEX) by department.</p>
+                    <a href="#" class="btn-access">Launch Dashboard →</a>
+                </div>
+            </article>
+
+            <!-- Dashboard Card 4 -->
+            <article class="card">
+                <div class="card-placeholder-img">
+                    <div class="placeholder-icon">🚚</div>
+                </div>
+                <div class="card-body">
+                    <span class="card-tag tag-ops">Operations</span>
+                    <h3 class="card-title">Supply Chain Velocity</h3>
+                    <p class="card-desc">Live tracking of inventory turnover rates, shipping logistics, and vendor performance scorecards.</p>
+                    <a href="#" class="btn-access">Launch Dashboard →</a>
+                </div>
+            </article>
+
+            <!-- Dashboard Card 5 -->
+            <article class="card">
+                <div class="card-placeholder-img">
+                    <div class="placeholder-icon">📈</div>
+                </div>
+                <div class="card-body">
+                    <span class="card-tag tag-sales">Marketing</span>
+                    <h3 class="card-title">Campaign ROI</h3>
+                    <p class="card-desc">Attribution modeling for recent digital campaigns, including conversion rates and customer acquisition costs.</p>
+                    <a href="#" class="btn-access">Launch Dashboard →</a>
+                </div>
+            </article>
+            
+             <!-- Dashboard Card 6 -->
+             <article class="card">
+                <div class="card-placeholder-img">
+                    <div class="placeholder-icon">🔒</div>
+                </div>
+                <div class="card-body">
+                    <span class="card-tag tag-ops">IT Security</span>
+                    <h3 class="card-title">Threat Monitor</h3>
+                    <p class="card-desc">Live status of firewall integrity, flagged access attempts, and system uptime reports.</p>
+                    <a href="#" class="btn-access">Launch Dashboard →</a>
+                </div>
+            </article>
+
+        </div>
+    </main>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. Get the current user's role from local storage.
+        const userRole = localStorage.getItem('userRole');
+
+        // Stop execution if no role is found (should prompt for login or handle error)
+        if (!userRole) {
+            console.warn('User role not found in local storage. Restricting all access.');
+            return;
+        }
+
+        // 2. Define the Access Control Lists (ACLs) by Link ID.
+        // The list must contain roles exactly as they are saved in the login script.
+        const accessLists = {
+            // Main Menu Links
+            "link-tasks": ['Administrator', 'Developer', 'Analyst', 'Marketing Executive'],
+            "link-exceptions": ['Administrator', 'Developer', 'Analyst'],
+
+            // Resources Links
+            "link-dashboards": [
+                'Administrator', 'Developer', 'Analyst', 'Sales Executive', 'Finance Executive', 
+                'Marketing Executive', 'Operations Executive', 'Marketing Paid Search Channel Manager', 
+                'Marketing Paid Social Channel Manager', 'Marketing Organic Search Channel Manager', 
+                'Marketing Direct Channel Manager'
+            ],
+            "link-powerbi": ['Administrator', 'Developer', 'Analyst', 'Marketing Executive'],
+            "link-planning": ['Administrator', 'Developer', 'Analyst', 'Finance Executive', 'Marketing Executive'],
+            "link-adhoc": ['Administrator', 'Developer', 'Analyst', 'Marketing Executive'],
+            "link-projects": ['Administrator', 'Developer', 'Analyst', 'Marketing Executive'],
+
+            // Bottom Menu Links
+            "link-settings": ['Administrator', 'Developer', 'Analyst', 'Marketing Executive'],
+
+	// ReportsandDashboards
+	"daily-dashboard":['Administrator', 'Developer', 'Analyst', 'Sales Executive', 'Finance Executive', 'Marketing Executive'],
+	"marketing-performance-dashboard":['Administrator', 'Developer', 'Analyst', 'Sales Executive', 'Finance Executive', 'Marketing Executive'],
+	"paid-search-performance-dashboard":['Administrator', 'Developer', 'Analyst','Marketing Paid Search Channel Manager' ],
+	"paid-social-performance-dashboard":['Administrator', 'Developer', 'Analyst','Marketing Paid Social Channel Manager' ],
+	"direct-organic-performance-dashboard":['Administrator', 'Developer', 'Analyst','Marketing Organic Search Channel Manager' ]
+
+        };
+
+        // 3. Iterate through the access lists and apply restrictions.
+        for (const [linkId, allowedRoles] of Object.entries(accessLists)) {
+            const linkElement = document.getElementById(linkId);
+            
+            // Check if the link element exists and if the user's role is NOT in the allowed list.
+            if (linkElement && !allowedRoles.includes(userRole)) {
+                linkElement.style.display = 'none';
+            }
+        }
+    });
+</script>
+</body>
+</html>
